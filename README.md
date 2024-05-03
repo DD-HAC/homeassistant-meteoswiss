@@ -1,5 +1,12 @@
 # homeassistant-meteoswiss (forked)
 
+> [!NOTE]
+> This fork is a copy of the Rudd-O fork of this integration because I am unsure of how the Home Assistant + HACS integration with github operates and want to review changes before they are rolled out to my HA server.
+>
+> DD
+
+----
+
 This is the Meteo Swiss integration for Home Assistant.
 
 **Note: due to changes in how HACS loads custom components
