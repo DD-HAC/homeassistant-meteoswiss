@@ -7,12 +7,12 @@ from typing import Final
 from homeassistant.const import (
     CONF_NAME,
     DEGREE,
-    IRRADIATION_WATTS_PER_SQUARE_METER,
     PERCENTAGE,
-    PRESSURE_HPA,
-    SPEED_KILOMETERS_PER_HOUR,
-    TEMP_CELSIUS,
-    TIME_MINUTES,
+    UnitOfIrradiance,
+    UnitOfPressure,
+    UnitOfSpeed,
+    UnitOfTemperature,
+    UnitOfTime,
 )
 
 DOMAIN = "meteoswiss"
@@ -63,7 +63,7 @@ SENSOR_DATA_ID = "msDataId"
 SENSOR_TYPES = {
     "temperature": {
         SENSOR_TYPE_NAME: "temperature",
-        SENSOR_TYPE_UNIT: TEMP_CELSIUS,
+        SENSOR_TYPE_UNIT: UnitOfTemperature.CELSIUS,
         SENSOR_TYPE_ICON: "mdi:thermometer",
         SENSOR_TYPE_CLASS: "temperature",
         SENSOR_DATA_ID: "tre200s0",
@@ -77,14 +77,14 @@ SENSOR_TYPES = {
     },
     "10minsun": {
         SENSOR_TYPE_NAME: "10 minute sun",
-        SENSOR_TYPE_UNIT: TIME_MINUTES,
+        SENSOR_TYPE_UNIT: UnitOfTime.MINUTES,
         SENSOR_TYPE_ICON: "mdi:weather-sunny",
         SENSOR_TYPE_CLASS: None,
         SENSOR_DATA_ID: "sre000z0",
     },
     "sun_radiant": {
         SENSOR_TYPE_NAME: "sun irradiation",
-        SENSOR_TYPE_UNIT: IRRADIATION_WATTS_PER_SQUARE_METER,
+        SENSOR_TYPE_UNIT: UnitOfIrradiance.WATTS_PER_SQUARE_METER,
         SENSOR_TYPE_ICON: "mdi:weather-sunny",
         SENSOR_TYPE_CLASS: None,
         SENSOR_DATA_ID: "gre000z0",
@@ -98,7 +98,7 @@ SENSOR_TYPES = {
     },
     "dew_point": {
         SENSOR_TYPE_NAME: "dew point",
-        SENSOR_TYPE_UNIT: TEMP_CELSIUS,
+        SENSOR_TYPE_UNIT: UnitOfTemperature.CELSIUS,
         SENSOR_TYPE_ICON: "mdi:weather-fog",
         SENSOR_TYPE_CLASS: None,
         SENSOR_DATA_ID: "tde200s0",
@@ -112,35 +112,35 @@ SENSOR_TYPES = {
     },
     "wind_speed": {
         SENSOR_TYPE_NAME: "wind speed",
-        SENSOR_TYPE_UNIT: SPEED_KILOMETERS_PER_HOUR,
+        SENSOR_TYPE_UNIT: UnitOfSpeed.KILOMETERS_PER_HOUR,
         SENSOR_TYPE_ICON: "mdi:weather-windy",
         SENSOR_TYPE_CLASS: None,
         SENSOR_DATA_ID: "fu3010z0",
     },
     "wind_speed_max": {
         SENSOR_TYPE_NAME: "wind speed max",
-        SENSOR_TYPE_UNIT: SPEED_KILOMETERS_PER_HOUR,
+        SENSOR_TYPE_UNIT: UnitOfSpeed.KILOMETERS_PER_HOUR,
         SENSOR_TYPE_ICON: "mdi:weather-windy",
         SENSOR_TYPE_CLASS: None,
         SENSOR_DATA_ID: "fu3010z1",
     },
     "pressure": {
         SENSOR_TYPE_NAME: "pressure",
-        SENSOR_TYPE_UNIT: PRESSURE_HPA,
+        SENSOR_TYPE_UNIT: UnitOfPressure.HPA,
         SENSOR_TYPE_ICON: "mdi:gauge",
         SENSOR_TYPE_CLASS: None,
         SENSOR_DATA_ID: "prestas0",
     },
     "pressure_qff": {
         SENSOR_TYPE_NAME: "pressure QFF",
-        SENSOR_TYPE_UNIT: PRESSURE_HPA,
+        SENSOR_TYPE_UNIT: UnitOfPressure.HPA,
         SENSOR_TYPE_ICON: "mdi:gauge",
         SENSOR_TYPE_CLASS: None,
         SENSOR_DATA_ID: "pp0qffs0",
     },
     "pressure_qnh": {
         SENSOR_TYPE_NAME: "pressure QNH",
-        SENSOR_TYPE_UNIT: PRESSURE_HPA,
+        SENSOR_TYPE_UNIT: UnitOfPressure.HPA,
         SENSOR_TYPE_ICON: "mdi:gauge",
         SENSOR_TYPE_CLASS: None,
         SENSOR_DATA_ID: "pp0qnhs0",
