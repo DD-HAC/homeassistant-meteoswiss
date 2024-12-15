@@ -10,9 +10,10 @@ from hamsclientfork import meteoSwissClient
 from hamsclientfork.client import ClientResult
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import Platform
-from homeassistant.core import Config, HomeAssistant
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.issue_registry import IssueSeverity
+from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
     UpdateFailed,
@@ -34,7 +35,7 @@ PLATFORMS = [Platform.SENSOR, Platform.WEATHER]
 MAX_CONTINUOUS_ERROR_TIME = 60 * 60
 
 
-async def async_setup(hass: HomeAssistant, config: Config):
+async def async_setup(hass: HomeAssistant, config: ConfigType):
     """Setup via old entry in configuration.yaml."""
     _LOGGER.debug("Async setup: meteoswiss")
 
