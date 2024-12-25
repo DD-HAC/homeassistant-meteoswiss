@@ -4,17 +4,7 @@
 > This fork is a copy of the Rudd-O fork of this integration because I am unsure of how the Home Assistant + HACS integration with github operates and want to review changes before they are rolled out to my HA server.
 >
 > DD
-
-----
-
-This is the Meteo Swiss integration for Home Assistant.
-
-**Note: due to changes in how HACS loads custom components
-(reflected in hassfest validation tests), we have had to
-change how this repository is installed.  Unfortunately,
-this caused problems with how an interim version of the
-integratoin itself is loaded.  See installation instructions
-below to get your setup fixed up.  We regret this mess.**
+This is the MeteoSwiss integration for Home Assistant.
 
 ## Features
 
@@ -25,8 +15,10 @@ below to get your setup fixed up.  We regret this mess.**
   (every entity has a unique ID).
 * Detects when your real-time weather station has been retired,
   and offers suggestions on how to fix the issue.
-* Imports the old Meteo Swiss YAML configuration and alerts
-  you to the needed removal of the deprecated YAML.
+* Supports hourly forecasts.
+* Supports two different real-time stations: a weather station
+  that may not give you rain data, and a precipitation station
+  that will give you rain data but may not give you other info.
 * Code is much cleaner and works properly.
 
 See below for common issues.
@@ -123,7 +115,9 @@ Now you are ready to add one or more instances of the integration.
   (a good guess is provided) and name your location.  You can select no
   weather station if you so desire — useful if there is no real-time
   weather station near where you live — in which case the real-time sensor
-  data is simply not provided as sensors.
+  data is simply not provided as sensors.  You may also select a real-time
+  precipitation station that is different from your weather station, to get
+  rain information closer to where you are.
 
 ![enter image description here](https://github.com/Rudd-O/homeassistant-meteoswiss/raw/master/docs/weatherstation.png)
 
@@ -133,6 +127,74 @@ Now you are ready to add one or more instances of the integration.
 
 If you are not happy with the settings, in a future release you
 will be able to update them.
+
+## How to create a sensor that has the weather forecast data
+
+Here is a sample of a YAML-based trigger-powered template sensor that creates
+three different sensors from a service call every fifteen minutes.  From the
+sample code below, you are to modify the `entity_id` to match your own weather
+entity ID, then place the adjusted code within your Home Assistant's
+`configuration.yaml` file (under `template:` as exemplified below), then
+restart Home Assistant.
+
+```yaml
+# ...
+template:
+# ...
+  - trigger:
+      - platform: time_pattern
+        minutes: /15
+    action:
+      - service: weather.get_forecasts
+        data:
+          type: daily
+        target:
+          entity_id: weather.meteoswiss
+        response_variable: response_forecast_daily
+    sensor:
+      - name: Tomorrow Max Temp
+        unique_id: d1b441ec-e9c6-43f8-a50a-c7c5c42c0ef5
+        state: "{{ response_forecast_daily['weather.meteoswiss'].forecast[1].temperature }}"
+
+      - name: Tomorrow Min Temp
+        unique_id: b88a351c-8eb7-40ae-8a9e-dcfeaa224551
+        state: "{{ response_forecast_daily['weather.meteoswiss'].forecast[1].templow }}"
+
+      - name: Tomorrow Mean Temp
+        unique_id: 6344f875-4569-4c3f-ad8d-ad6bccc5bc61
+        state: "{{ ((response_forecast_daily['weather.meteoswiss'].forecast[1].temperature) + (response_forecast_daily['weather.meteoswiss'].forecast[1].templow)) /2}}"
+```
+
+You can also create a sensor that will have the list of hourly forecasts
+as an attribute you can consult:
+
+```yaml
+# ...
+template:
+# ...
+  - trigger:
+    - platform: state
+      entity_id: weather.biasca_circolo_della_riviera_distretto_di_riviera_2
+    - platform: homeassistant
+      event: start
+    - platform: event
+      event_type: event_template_reloaded
+    action:
+      - service: weather.get_forecasts
+        data:
+          type: hourly
+        target:
+          entity_id: weather.biasca_circolo_della_riviera_distretto_di_riviera_2
+        response_variable: hourly
+    sensor:
+      - name: Wettervorhersage Biasca Stuendlich
+        unique_id: weather_forecast_biasca_hourly
+        state: "{{ now().isoformat() }}"
+        attributes:
+          forecast: "{{ hourly['weather.biasca_circolo_della_riviera_distretto_di_riviera_2'].forecast }}"
+```
+
+That one is very useful to retract awnings and other smart home activities.
 
 ## Troubleshooting
   

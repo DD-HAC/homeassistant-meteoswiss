@@ -1,16 +1,20 @@
 {
     "issues": {
         "deprecated_yaml": {
-            "title": "La configuración Meteo Swiss mediante YAML configuration está obsoleta",
-            "description": "Configurar Meteo Swiss mediante YAML será removida a futuro.\n\nSu configuración existente ha sido importada automáticamente a su interfaz de usuario.\n\nRemueva la sección de configuración de Swiss Meteo configuration de su archivo configuration.yaml file y reinicie Home Assistant para solucionar esta advertencia."
+            "title": "La configuración MeteoSwiss mediante YAML configuration está obsoleta",
+            "description": "Configurar MeteoSwiss mediante YAML será removida a futuro.\n\nSu configuración existente ha sido importada automáticamente a su interfaz de usuario.\n\nRemueva la sección de configuración de MeteoSwiss configuration de su archivo configuration.yaml file y reinicie Home Assistant para solucionar esta advertencia."
         },
         "station_no_data": {
             "title": "Una estación meteorológica de tiempo real parece estar ausente",
-            "description": "La estación de tiempo real que se usa en Meteo Swiss ({station}) parece ya no ofrecer datos.\n\nDe momento, la única reparación posible es remover esta integración y volver a agregarla, seleccionande una nueva estación meteorológica.\n\nHasta que esta reparación sea efectuada, sus sensores y el estado del tiempo actual aparecerán como no disponibles."
+            "description": "La estación de tiempo real que se usa en MeteoSwiss ({station}) parece ya no ofrecer datos.\n\nDe momento, la única reparación posible es remover esta integración y volver a agregarla, seleccionando una nueva estación meteorológica.\n\nHasta que esta reparación sea efectuada, sus sensores y el estado del tiempo actual aparecerán como no disponibles."
+        },
+        "post_code_no_data": {
+            "title": "MeteoSwiss parece no proveer pronósticos para el código postal",
+            "description": "El código postal {post_code} no tiene ningún pronóstico disponible.\n\nDe momento, la única reparación posible es remover esta integración y volver a agregarla, seleccionando un nuevo código postal.\n\nHasta que esta reparación sea efectuada, el pronóstico aparecerá como no disponible."
         },
         "improperly_configured": {
-            "title": "La integración  Meteo Swiss no está correctamente configurada",
-            "description": "La integración Meteo Swiss con ID {entry_id} no está correctamente configurada.\n\nPor favor elimine esa entrada de configuración y vuelva a recrearla."
+            "title": "La integración MeteoSwiss no está correctamente configurada",
+            "description": "La integración MeteoSwiss con ID {entry_id} no está correctamente configurada.\n\nPor favor elimine esa entrada de configuración y vuelva a recrearla."
         }
     },
     "config": {
@@ -19,6 +23,8 @@
             "unknown": "Error desconocido; por favor intente más tarde"
         },
         "error": {
+            "cannot_query_address": "OpenStreetMap no pudo inferir su dirección; por favor entre la información manualmente",
+            "cannot_query_postcode": "OpenStreetMap no pudo inferir su código postal; por favor entre la información manualmente",
             "lat": "La latitud especificada no está entre -90 y 90 grados",
             "lon": "La longitud especificada no está entre -180 y 180 grados",
             "invalid_station_name": "Estación inválida (deben ser 3 caracteres); verifique las estaciones aquí: https://rudd-o.com/meteostations",
@@ -48,7 +54,9 @@
             "user_three": {
                 "data": {
                     "station": "Estación meteorológica en tiempo real",
-                    "real_time_name": "Nombres de las entidades en tiempo real"
+                    "real_time_name": "Nombres de las entidades de la estación meteorológica",
+                    "precipitation_station": "Estación de precipitación en tiempo real",
+                    "real_time_precipitation_name": "Nombres de las entidades de la estación de precipitación"
                 },
                 "description": "The real-time weather station is used to look up the current weather at the station and provide them as sensors.  Selecting the first option of the list disables real-time weather sensors.\n\nIf a weather station is selected, the real-time entity names field is used to name the real-time (sensor) entities.  If no station is chosen, the real-time entity names field is ignored.\n\nhttps://rudd-o.com/meteostations lists the available real-time weather stations.",
                 "title": "Estación meteorológica en tiempo real"

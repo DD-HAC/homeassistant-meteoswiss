@@ -1,16 +1,20 @@
 {
     "issues": {
         "deprecated_yaml": {
-            "title": "The Meteo Swiss YAML configuration is being removed",
-            "description": "Configuring Meteo Swiss using YAML is being removed.\n\nYour existing YAML configuration has been imported into the UI automatically.\n\nRemove the Swiss Meteo configuration from your configuration.yaml file and restart Home Assistant to fix this issue."
+            "title": "Konfigurasjonen for MeteoSveits i YAML-format blir fjernet",
+            "description": "Konfigurering av MeteoSveits ved hjelp av YAML blir fjernet.\n\nDin eksisterende YAML-konfigurasjon er blitt importert inn i brukergrensesnittet automatisk.\n\nFjern MeteoSveits-konfigurasjonen fra din configuration.yaml-fil og restart Home Assistant for å løse dette problemet."
         },
         "station_no_data": {
-            "title": "Meteo Swiss weather station appears to be gone",
-            "description": "The real-time weather station Meteo Swiss is using ({station}) is no longer offering data.\n\nCurrently, the only repair possible involves removing and re-adding the Meteo Swiss integration, selecting a new real-time weather station.\n\nUntil this repair is made, all real-time weather sensors and reports coming from this station will show as unavailable."
+            "title": "Værstatonen for MeteoSveits ser ut til å være gått",
+            "description": "Den sanntids værstasjonen MeteoSveits bruker ({station}) skiller ikke lenger ut data.\n\nFor tiden er det bare mulig å løse dette ved å fjerne og gjeninnføre MeteoSveits-integreringen, velge en ny sanntids værstasjon.\n\nIndtil dette løses, vil alle sanntids- og sensorenheter og rapporter som kommer fra denne stasjonen vises som uoppløselige."
+        },
+        "post_code_no_data": {
+            "title": "MeteoSveits viser ikke noen forutseigelser for postnummer",
+            "description": "Postnummer {post_code} ser ut til å ha ingen forutseigelser tilgjengelig.\n\nNåværende, den eneste reparasjon mulig består i å fjerne og gjeninnstille integreringen MeteoSveits, velge et nytt postnummer.\n\nInntil denne reparasjon er gjennomført, vil forutseigelser vise seg som uaktuell."
         },
         "improperly_configured": {
-            "title": "Meteo Swiss integration improperly configured",
-            "description": "The Meteo Swiss integration with entry ID {entry_id} is improperly configured.\n\nPlease remove your configuration entry and recreate it."
+            "title": "Integrasjonsfellet for MeteoSveits er ikke konfigurert korrekt",
+            "description": "MeteoSveits-integreringen med entry ID {entry_id} er ikke konfigurert korrekt.\n\nVennligst fjern din konfigurasjon og skap den på nytt."
         }
     },
     "config": {
@@ -19,39 +23,43 @@
             "unknown": "Ukjent feil: prøv på nytt senere"
         },
         "error": {
-            "lat": "The supplied latitude does not fall between -90 y 90 degrees",
-            "lon": "The supplied latitude does not fall between -180 y 180 degrees",
+            "cannot_query_address": "OpenStreetMap ne ønsket å gueß adresse for din lokasjon; skriv inn informasjonen selv",
+            "cannot_query_postcode": "OpenStreetMap ne ønsket å gueß postnummer for din lokasjon; skriv inn informasjonen selv",
+            "lat": "Høyden er utenfor grensene -90 til 90 grader",
+            "lon": "Breddelsen er utenfor grensene -180 til 180 grader",
             "invalid_station_name": "Stasjonsnavnet er ugyldig; vennligst sjekk https://rudd-o.com/meteostations for stasjonsliste",
-            "invalid_postcode": "Postnummer er ugyldig. Denne integrasjonen fungerer bare med Sveits postnummer",
-            "forecast_name_empty": "Forecast name cannot be empty",
-            "empty_name": "The display name is empty",
-            "update_interval_too_low": "The update interval is too low.  Must be minimum 1 minute."
+            "invalid_postcode": "Postnummeret er ugyldig. Denne integrasjonen fungerer bare med Sveits' postnummer",
+            "forecast_name_empty": "Været navn kan ikke være tomt",
+            "empty_name": "Visningsnavnet er tomt",
+            "update_interval_too_low": "Oppdateringsintervall er for lavt.  Må være minimum 1 minut"
         },
         "step": {
             "user": {
                 "data": {
-                    "latitude": "Latitude",
-                    "longitude": "Longitude"
+                    "latitude": "Høyde",
+                    "longitude": "Breddegrad"
                 },
-                "description": "Confirm your geographical position.  This will be used to guess the closest real-time weather station and approximate your postal code for forecasts.",
-                "title": "Location"
+                "description": "Bevis din geografiske posisjon. Dette vil brukes til å gueß den nærmeste sanntids værstasjon og anner opp postnummer for prosjekter.",
+                "title": "Lokasjon"
             },
             "user_two": {
                 "data": {
                     "postcode": "Postnummer",
-                    "forecast_name": "Forecast (weather) entity name",
+                    "forecast_name": "Været navn (vær) enhetsnavn",
                     "update_interval": "Oppdateringsintervall i minutter"
                 },
-                "description": "The postal code is used to look up the 5-day forecast.  The name you enter here will be used for the forecast (weather) entity.",
-                "title": "Forecast"
+                "description": "Postnummeret brukes til å lete opp 5-dagers værforslag. Navnet du skriver inn her, vil brukes for vær- (vær) enhetsnavn.",
+                "title": "Værforslag"
             },
             "user_three": {
                 "data": {
-                    "station": "Sanntids værstasjon",
-                    "real_time_name": "Real-time entity names"
+                    "station": "Sanntidsværstasjon",
+                    "real_time_name": "Navn på sanntids- og vær-entiteter",
+                    "precipitation_station": "Sanntids-nedbørstasjon",
+                    "real_time_precipitation_name": "Navn på sanntids- og nedbørs-entiteter"
                 },
-                "description": "The real-time weather station is used to look up the current weather at the station and provide them as sensors.  Selecting the first option of the list disables real-time weather sensors.\n\nIf a weather station is selected, the real-time entity names field is used to name the real-time (sensor) entities.  If no station is chosen, the real-time entity names field is ignored.\n\nhttps://rudd-o.com/meteostations lists the available real-time weather stations.",
-                "title": "Real-time weather"
+                "description": "Sanntids værstatonen brukes til å lete opp aktuell været ved stasjonen og å gi disse som sensorer. Hvis du velger første alternativ i listen, deaktiverer dette sanntids- og sensorenheter.\\n\\nHvis en værstasjon blir valgt, brukes feltet for navn på sanntids- og sensorenheter til å navngi sanntids- (sensore) enheter. Hvis ingen stasjon blir valgt, ignoreres feltet for navn på sanntids- og sensorenheter.\\n\\nhttps://rudd-o.com/meteostations viser listen over tillgjengelige sanntids værstationer.",
+                "title": "Sanntidsvær"
             }
         }
     }

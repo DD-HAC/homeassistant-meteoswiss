@@ -1,0 +1,66 @@
+{
+    "issues": {
+        "deprecated_yaml": {
+            "title": "La configurazione YAML di MeteoSvizzera viene rimossa",
+            "description": "La configurazione di MeteoSvizzera utilizzando YAML viene rimossa.\\n\\nLa tua configurazione YAML esistente è stata importata automaticamente nel pannello di controllo.\\n\\nRimuovi la configurazione svizzera di Meteo dal tuo file configuration.yaml e riavvia Home Assistant per risolvere questo problema."
+        },
+        "station_no_data": {
+            "title": "La stazione meteorologica di MeteoSvizzera sembra essere andata perduta",
+            "description": "La stazione meteorologica di MeteoSvizzera utilizzando ({station}) non offre più dati.\\n\\nAttualmente, l'unico riparazione possibile prevede la rimozione e la riacquisizione dell'integrazione di MeteoSvizzera, selezionando una nuova stazione meteorologica in tempo reale.\\n\\nFino a che questa riparazione non sia effettuata, tutti i sensori e le relazioni meteorologici in tempo reale provenienti da questa stazione mostreranno come indisponibili."
+        },
+        "post_code_no_data": {
+            "title": "MeteoSvizzera sembra non fornire previsioni per il codice di avviamento",
+            "description": "Il codice di avviamento {post_code} sembra non avere alcuna previsione disponibile.\n\nAttualmente, l'unica correzione possibile consiste nell'eliminare e riacquisire l'integrazione MeteoSvizzera, selezionando un nuovo codice di avviamento.\n\nFinché questa correzione non è stata eseguita, la previsione mostrerà come indisponibile."
+        },
+        "improperly_configured": {
+            "title": "L'integrazione di MeteoSvizzera non è configurata correttamente",
+            "description": "L'integrazione di MeteoSvizzera con ID di inserimento {entry_id} non è configurata correttamente.\\n\\nPer favore, rimuovi il tuo entry di configurazione e ricrearlo."
+        }
+    },
+    "config": {
+        "abort": {
+            "already_configured": "Già configurato",
+            "unknown": "Errore sconosciuto: per favore riprova più tardi"
+        },
+        "error": {
+            "cannot_query_address": "OpenStreetMap rifiuta di indovinare l'indirizzo della tua posizione; per favore inserisci le informazioni manualmente",
+            "cannot_query_postcode": "OpenStreetMap rifiuta di indovinare il codice postale della tua posizione; per favore inserisci le informazioni manualmente",
+            "lat": "La longitudine fornita non cade tra -90 e 90 gradi",
+            "lon": "La longitudine fornita non cade tra -180 e 180 gradi",
+            "invalid_station_name": "Il nome della stazione è invalido; per favore controlla https://rudd-o.com/meteostations per la lista delle stazioni",
+            "invalid_postcode": "Il codice postale è invalido; questa integrazione funziona solo con i codici postali svizzeri",
+            "forecast_name_empty": "Il nome del preavviso non può essere vuoto",
+            "empty_name": "Il nome da visualizzare è vuoto",
+            "update_interval_too_low": "L'intervallo di aggiornamento è troppo basso; deve essere almeno 1 minuto"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "latitude": "Longitudine",
+                    "longitude": "Latitudine"
+                },
+                "description": "Conferma la tua posizione geografica. Questo verrà utilizzato per indovinare la stazione meteorologica in tempo reale più vicina e approssimare il codice postale per i preavvisi.",
+                "title": "Posizione"
+            },
+            "user_two": {
+                "data": {
+                    "postcode": "Codice postale",
+                    "forecast_name": "Nome dell'entità del preavviso (meteorologico)",
+                    "update_interval": "Intervallo di aggiornamento (minuti)"
+                },
+                "description": "Il codice postale viene utilizzato per cercare il preavviso a 5 giorni. Il nome che inserisci qui verrà utilizzato per l'entità del preavviso.",
+                "title": "Preavviso"
+            },
+            "user_three": {
+                "data": {
+                    "station": "Stazione meteo in tempo reale",
+                    "real_time_name": "Nomi di entità meteo in tempo reale",
+                    "precipitation_station": "Stazione di precipitazioni in tempo reale",
+                    "real_time_precipitation_name": "Nomi di entità di precipitazioni in tempo reale"
+                },
+                "description": "La stazione meteorologica in tempo reale viene utilizzata per cercare il meteo attuale alla stazione e fornire loro come sensori. Selezionando la prima opzione della lista, si disattiva i sensori di meteo in tempo reale.\\n\\nSe una stazione meteorologica è selezionata, il campo dei nomi delle entità in tempo reale viene utilizzato per denominare le entità in tempo reale (sensori). Se nessuna stazione è scelta, si ignora il campo dei nomi delle entità in tempo reale.\\n\\nhttps://rudd-o.com/meteostations elenca le stazioni meteorologiche in tempo reale disponibili.",
+                "title": "Meteo in tempo reale"
+            }
+        }
+    }
+}

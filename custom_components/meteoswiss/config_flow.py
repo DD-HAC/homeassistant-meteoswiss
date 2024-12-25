@@ -1,4 +1,5 @@
 """Config flow to configure the Meteo-Swiss integration."""
+
 import logging
 import re
 from typing import Any
@@ -15,21 +16,25 @@ from custom_components.meteoswiss.const import (
     CONF_LON,
     CONF_NAME,
     CONF_POSTCODE,
+    CONF_PRECIPITATION_NAME,
+    CONF_PRECIPITATION_STATION,
     CONF_REAL_TIME_NAME,
+    CONF_REAL_TIME_PRECIPITATION_NAME,
     CONF_STATION,
     CONF_UPDATE_INTERVAL,
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
+    USER_AGENT,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 
 NO_STATION = "No real-time weather station"
+NO_PRECIPITATION_STATION = "No real-time precipitation station"
 
 
 class MeteoSwissFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:ignore
-
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
 
@@ -43,7 +48,10 @@ class MeteoSwissFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:i
         self._update_interval = None
 
     async def async_step_user(self, user_input=None):
-        """Handle a flow initiated by the user."""
+        """Handle a flow initiated by the user.
+
+        In this step, we collect the latitude and longitude.
+        """
 
         _LOGGER.debug(
             "step user: starting with lat %s lon %s post %s",
@@ -95,7 +103,11 @@ class MeteoSwissFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:i
         return await self.async_step_user_two()
 
     async def async_step_user_two(self, user_input=None):
-        """Handle the second step of setup."""
+        """Handle the second step of setup.
+
+        In this step we collect the postal code, the name of the forecast,
+        and the update interval.
+        """
 
         _LOGGER.debug(
             "step user two: starting with lat %s lon %s post %s",
@@ -144,21 +156,33 @@ class MeteoSwissFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:i
                 user_input[CONF_UPDATE_INTERVAL],
             )
         else:
-            geodata = await self.hass.async_add_executor_job(
-                client.getGeoData, self._lat, self._lon
-            )
-            guessed_postal_code = str(
-                geodata.get("address", {}).get(
-                    "postcode",
-                    "",
+            try:
+                geodata = await self.hass.async_add_executor_job(
+                    client.getGeoData,
+                    self._lat,
+                    self._lon,
+                    USER_AGENT,
                 )
-            )
-            guessed_address = " ".join(
-                x.strip()
-                for x in str(geodata.get("display_name", "",)).split(
-                    ","
-                )[:3]
-            )
+                guessed_postal_code = str(
+                    geodata.get("address", {}).get(
+                        "postcode",
+                        "",
+                    )
+                )
+                guessed_address = " ".join(
+                    x.strip()
+                    for x in str(
+                        geodata.get(
+                            "display_name",
+                            "",
+                        )
+                    ).split(",")[:3]
+                )
+            except Exception:
+                errors[CONF_POSTCODE] = "cannot_query_postcode"
+                errors[CONF_FORECAST_NAME] = "cannot_query_address"
+                guessed_postal_code = ""
+                guessed_address = ""
 
             schema = data_schema(
                 guessed_postal_code,
@@ -183,12 +207,28 @@ class MeteoSwissFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:i
         )
         return await self.async_step_user_three()
 
-    async def _get_all_stations_and_closest_one(self, client, lat, lon):
+    async def _get_all_weather_stations_and_closest_one(
+        self, client, lat, lon
+    ) -> tuple[str, str, str]:
+        return await self._get_all_stations_and_closest_one(
+            client, lat, lon, station_type=StationType.WEATHER
+        )
+
+    async def _get_all_precipitation_stations_and_closest_one(
+        self, client, lat, lon
+    ) -> tuple[str, str, str]:
+        return await self._get_all_stations_and_closest_one(
+            client, lat, lon, station_type=StationType.PRECIPITATION
+        )
+
+    async def _get_all_stations_and_closest_one(
+        self, client, lat, lon, station_type
+    ) -> tuple[str, str, str]:
         default_station = await self.hass.async_add_executor_job(
             client.get_closest_station,
             lat,
             lon,
-            StationType.WEATHER,
+            station_type,
         )
         if default_station:
             default_station_name = await self.hass.async_add_executor_job(
@@ -198,7 +238,7 @@ class MeteoSwissFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:i
             default_station_name = ""
         stations = await self.hass.async_add_executor_job(
             client.get_all_stations,
-            StationType.WEATHER,
+            station_type,
         )
         all_stations = {NO_STATION: ""}
         all_stations.update(
@@ -214,7 +254,7 @@ class MeteoSwissFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:i
         return default_station, default_station_name, all_stations
 
     async def async_step_user_three(self, user_input=None):
-        """Handle the final step of setup."""
+        """Handle the step of setup."""
         _LOGGER.debug(
             "step user three: continuing with lat %s lon %s post %s",
             self._lat,
@@ -222,16 +262,31 @@ class MeteoSwissFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:i
             self._post_code,
         )
 
-        def data_schema(name, station, stations):
+        def data_schema(
+            name,
+            weather_station,
+            weather_stations,
+            precipitation_name,
+            precipitation_station,
+            precipitation_stations,
+        ):
             return vol.Schema(
                 {
                     vol.Required(
                         CONF_STATION,
-                        default=station,
-                    ): vol.In(list(stations)),
+                        default=weather_station,
+                    ): vol.In(list(weather_stations)),
                     vol.Optional(
                         CONF_REAL_TIME_NAME,
                         default=name,
+                    ): str,
+                    vol.Required(
+                        CONF_PRECIPITATION_STATION,
+                        default=precipitation_station,
+                    ): vol.In(list(precipitation_stations)),
+                    vol.Optional(
+                        CONF_REAL_TIME_PRECIPITATION_NAME,
+                        default=precipitation_name,
                     ): str,
                 }
             )
@@ -243,10 +298,20 @@ class MeteoSwissFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:i
         )
 
         (
-            default_station,
-            default_station_name,
-            stations,
-        ) = await self._get_all_stations_and_closest_one(
+            default_weather_station,
+            default_weather_station_name,
+            weather_stations,
+        ) = await self._get_all_weather_stations_and_closest_one(
+            client,
+            self._lat,
+            self._lon,
+        )
+
+        (
+            default_precipitation_station,
+            default_precipitation_station_name,
+            precipitation_stations,
+        ) = await self._get_all_precipitation_stations_and_closest_one(
             client,
             self._lat,
             self._lon,
@@ -254,43 +319,73 @@ class MeteoSwissFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:i
 
         errors = {}
         if user_input is not None:
-            if user_input[CONF_STATION] not in stations:
+            if user_input[CONF_STATION] not in weather_stations:
                 errors[CONF_STATION] = "invalid_station_name"
-
-            station = stations[user_input[CONF_STATION]]
-            if station:
-                real_time_name = user_input[CONF_REAL_TIME_NAME].strip()
-
-                if len(real_time_name) < 1:
+            weather_station = weather_stations[user_input[CONF_STATION]]
+            if weather_station:
+                real_time_weather_name = user_input[CONF_REAL_TIME_NAME].strip()
+                if len(real_time_weather_name) < 1:
                     errors[CONF_REAL_TIME_NAME] = "empty_name"
-
                 # check if the station name is 3 character
-                if not re.match(r"^\w{3}$", station):
+                if not re.match(r"^\w{3}$", weather_station):
                     errors[CONF_STATION] = "invalid_station_name"
-
             else:
-                station = None
-                real_time_name = None
+                weather_station = None
+                real_time_weather_name = None
+
+            if user_input[CONF_PRECIPITATION_STATION] not in precipitation_stations:
+                errors[CONF_PRECIPITATION_STATION] = "invalid_station_name"
+            precipitation_station = precipitation_stations[
+                user_input[CONF_PRECIPITATION_STATION]
+            ]
+            if precipitation_station:
+                real_time_precipitation_name = user_input[
+                    CONF_REAL_TIME_PRECIPITATION_NAME
+                ].strip()
+                if len(real_time_precipitation_name) < 1:
+                    errors[CONF_REAL_TIME_PRECIPITATION_NAME] = "empty_name"
+                # check if the station name is 3 character
+                if not re.match(r"^\w{3}$", weather_station):
+                    errors[CONF_PRECIPITATION_STATION] = "invalid_station_name"
+            else:
+                precipitation_station = None
+                real_time_precipitation_name = None
 
             schema = data_schema(
                 user_input[CONF_REAL_TIME_NAME],
                 user_input[CONF_STATION],
-                stations,
+                weather_stations,
+                user_input[CONF_REAL_TIME_PRECIPITATION_NAME],
+                user_input[CONF_PRECIPITATION_STATION],
+                precipitation_stations,
             )
         else:
-            if default_station:
+            if default_weather_station:
                 default_station_selection = "%s (%s)" % (
-                    default_station_name,
-                    default_station,
+                    default_weather_station_name,
+                    default_weather_station,
                 )
             else:
-                default_station_selection = NO_STATION
-            default_station_name = default_station_name or ""
+                default_weather_station = NO_PRECIPITATION_STATION
+            if default_precipitation_station:
+                default_precipitation_station_selection = "%s (%s)" % (
+                    default_precipitation_station_name,
+                    default_precipitation_station,
+                )
+            else:
+                default_precipitation_station_selection = NO_PRECIPITATION_STATION
+            default_weather_station_name = default_weather_station_name or ""
+            default_precipitation_station_name = (
+                default_precipitation_station_name or ""
+            )
 
             schema = data_schema(
-                default_station_name,
+                default_weather_station_name,
                 default_station_selection,
-                stations,
+                weather_stations,
+                default_precipitation_station_name,
+                default_precipitation_station_selection,
+                precipitation_stations,
             )
 
         if errors or user_input is None:
@@ -303,18 +398,26 @@ class MeteoSwissFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:i
             CONF_FORECAST_NAME: self._forecast_name,
             CONF_UPDATE_INTERVAL: self._update_interval,
         }
-        if station and real_time_name:
+        if weather_station and real_time_weather_name:
             data.update(
                 {
-                    CONF_STATION: station,
-                    CONF_REAL_TIME_NAME: real_time_name,
+                    CONF_STATION: weather_station,
+                    CONF_REAL_TIME_NAME: real_time_weather_name,
+                }
+            )
+        if precipitation_station and real_time_precipitation_name:
+            data.update(
+                {
+                    CONF_PRECIPITATION_STATION: precipitation_station,
+                    CONF_REAL_TIME_PRECIPITATION_NAME: real_time_precipitation_name,
                 }
             )
 
-        if real_time_name:
-            title = "%s / %s" % (self._forecast_name, real_time_name)
-        else:
-            title = self._forecast_name
+        title = self._forecast_name
+        if real_time_weather_name:
+            title += f" / {real_time_weather_name}"
+        if real_time_precipitation_name:
+            title += f" / {real_time_precipitation_name}"
 
         _LOGGER.debug(
             "step user three: finishing with %s",
@@ -347,6 +450,11 @@ class MeteoSwissFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:i
         if import_config.get(CONF_STATION):
             data[CONF_STATION] = import_config[CONF_STATION]
             data[CONF_REAL_TIME_NAME] = import_config[CONF_NAME]
+        if import_config.get(CONF_PRECIPITATION_STATION):
+            data[CONF_PRECIPITATION_STATION] = import_config[CONF_PRECIPITATION_STATION]
+            data[CONF_REAL_TIME_PRECIPITATION_NAME] = import_config[
+                CONF_PRECIPITATION_NAME
+            ]
 
         return self.async_create_entry(
             title=data[CONF_NAME],

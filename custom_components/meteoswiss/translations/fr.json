@@ -1,16 +1,20 @@
 {
     "issues": {
         "deprecated_yaml": {
-            "title": "The Meteo Swiss YAML configuration is being removed",
-            "description": "Configuring Meteo Swiss using YAML is being removed.\n\nYour existing YAML configuration has been imported into the UI automatically.\n\nRemove the Swiss Meteo configuration from your configuration.yaml file and restart Home Assistant to fix this issue."
+            "title": "La configuration YAML de MétéoSuisse est en train de être supprimée",
+            "description": "La configuration YAML de MétéoSuisse est en train d'être supprimée.\\n\\nL'importation automatique de votre configuration YAML a été effectuée avec succès dans l'interface utilisateur.\\n\\nSupprimez la configuration MétéoSuisse de votre fichier configuration.yaml et redémarrez Home Assistant pour résoudre ce problème."
         },
         "station_no_data": {
-            "title": "Meteo Swiss weather station appears to be gone",
-            "description": "The real-time weather station Meteo Swiss is using ({station}) is no longer offering data.\n\nCurrently, the only repair possible involves removing and re-adding the Meteo Swiss integration, selecting a new real-time weather station.\n\nUntil this repair is made, all real-time weather sensors and reports coming from this station will show as unavailable."
+            "title": "La station météo de MétéoSuisse semble avoir disparu",
+            "description": "La station météo en temps réel de MétéoSuisse, qui utilise ({station}), n'offre plus de données.\\n\\nActuellement, la seule possibilité de réparation consiste à supprimer et à re-ajouter l'intégration MétéoSuisse, tout en sélectionnant une nouvelle station météo en temps réel.\\n\\nJusqu'à ce que cette réparation soit effectuée, tous les capteurs météo et les rapports provenant de cette station afficheront comme indisponibles."
+        },
+        "post_code_no_data": {
+            "title": "MétéoSuisse semble ne pas fournir de prévisions pour le code postal",
+            "description": "Le code postal {post_code} ne semble pas avoir de prévision disponible.\n\nActuellement, la seule correction possible consiste à supprimer et à ré-ajouter l'intégration MétéoSuisse, en sélectionnant un nouveau code postal.\n\nJusqu'à ce que cette correction soit effectuée, les prévisions apparaîtront comme indisponibles."
         },
         "improperly_configured": {
-            "title": "Meteo Swiss integration improperly configured",
-            "description": "The Meteo Swiss integration with entry ID {entry_id} is improperly configured.\n\nPlease remove your configuration entry and recreate it."
+            "title": "L'intégration de MétéoSuisse est mal configurée",
+            "description": "L'intégration de MétéoSuisse avec l'ID d'entrée {entry_id} n'est pas correctement configurée.\\n\\nVeuillez supprimer votre entrée de configuration et la recréer."
         }
     },
     "config": {
@@ -19,13 +23,15 @@
             "unknown": "Erreur inconnue : veuillez réessayer plus tard"
         },
         "error": {
-            "lat": "La latitude fournie n'est pas comprise entre -90 et 90 degrés.",
-            "lon": "La latitude fournie n'est pas comprise entre -180 et 180 degrés.",
-            "invalid_station_name": "Nom de la station invalide; merci de vérifier sur: https://rudd-o.com/meteostations",
-            "invalid_postcode": "Code postale incorrecte; cette intégration ne fonctionne que pour de codes postaux suisse",
-            "forecast_name_empty": "Le nom de la prévision ne peut être vide",
-            "empty_name": "Le nom d'affichage est vide",
-            "update_interval_too_low": "L'intervalle de mise à jour est trop court. Il doit être d'au moins 1 minute."
+            "cannot_query_address": "OpenStreetMap a refusé de deviner l'adresse pour votre emplacement; veuillez entrer les informations manuellement",
+            "cannot_query_postcode": "OpenStreetMap a refusé de deviner le code postal pour votre emplacement; veuillez entrer les informations manuellement",
+            "lat": "La latitude fournie ne tombe pas entre -90 et 90 degrés",
+            "lon": "La longitude fournie ne tombe pas entre -180 et 180 degrés",
+            "invalid_station_name": "Le nom de la station est invalide; veuillez consulter https://rudd-o.com/meteostations pour la liste des stations",
+            "invalid_postcode": "Le code postal est invalide. Cette intégration ne fonctionne que avec les codes postaux suisses",
+            "forecast_name_empty": "Le nom de prévision ne peut pas être vide",
+            "empty_name": "Le nom à afficher est vide",
+            "update_interval_too_low": "L'intervalle d'actualisation est trop bas.  Doit être minimum 1 minute"
         },
         "step": {
             "user": {
@@ -42,13 +48,15 @@
                     "forecast_name": "Nom de l'entité des prévisions (entity name)",
                     "update_interval": "Intervalle de mise à jour en minutes"
                 },
-                "description": "The postal code is used to look up the 5-day forecast.  The name you enter here will be used for the forecast (weather) entity.",
-                "title": "Forecast"
+                "description": "Le code postal est utilisé pour consulter les prévisions météo à 5 jours. Le nom que vous entrez ici sera utilisé pour l'entité de prévision (météo).",
+                "title": "Prévisions"
             },
             "user_three": {
                 "data": {
                     "station": "Station météo en temps réel",
-                    "real_time_name": "Noms des entités en temps réel"
+                    "real_time_name": "Noms des entités météo",
+                    "precipitation_station": "Station météo en temps réel pour la précipitation",
+                    "real_time_precipitation_name": "Noms des entités pour la précipitation"
                 },
                 "description": "La station météorologique en temps réel est utilisée pour consulter les conditions météorologiques actuelles de la station et les fournir en tant que capteur. La sélection de la première option de la liste désactive les capteurs en temps réel. \n- Si une station météorologique est sélectionnée, le champ des noms d'entités en temps réel est utilisé pour nommer les entités en temps réel (capteurs). Si aucune station n'est choisie, le champ des noms des entités en temps réel est ignoré.\n- https://rudd-o.com/meteostations dresse la liste des stations météorologiques en temps réel disponibles.",
                 "title": "Météo en temps réel"
